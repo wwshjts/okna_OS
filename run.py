@@ -3,7 +3,7 @@ import sys
 import os
 
 ARGS_LEN = 2
-KERNEL_SIZE = 324 * 2**10 - 512 
+KERNEL_SIZE = 384 * 2**10 - 512 
 
 def get_check_sum(name:str) -> int:
     res = 0
@@ -11,8 +11,9 @@ def get_check_sum(name:str) -> int:
         #Читаем один байт
         byte = fl.read(1)
         while byte:
-            res += int.from_bytes(byte) 
+            res = (res + int.from_bytes(byte)) % 2**16
             byte = fl.read(1)
+    print(f'Check sum for {name} is {hex(res)}')
     return res
 
 if __name__ == "__main__":
@@ -30,16 +31,17 @@ if __name__ == "__main__":
         print(f"Kernel is too big {kernel_size}\nrecommend size <{KERNEL_SIZE}")
         exit(1)
     
-    check = get_check_sum("kernel.bin")
-    check += get_check_sum("boot.bin")
+    get_check_sum("boot.img")
 
     if len(sys.argv) < 2:
-        os.system("qemu-system-i386 -monitor stdio boot.img") 
+        os.system("qemu-system-i386 -monitor stdio -fda boot.img") 
     elif sys.argv == "-d":
-	    os.system("qemu-system-i386  boot.img -s -S -vnc  &")
+	    os.system("qemu-system-i386 -fda boot.img -s -S -vnc  &")
     else:
         print("Unknown option")
         exit(3)
+
+    get_check_sum("mem.bin")
 
     
 
