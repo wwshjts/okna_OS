@@ -1,3 +1,4 @@
 *.bin
 *.img
 os.bxrc
+os-dbg.bxrc
