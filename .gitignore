@@ -1,4 +1,6 @@
 *.bin
 *.img
+*.o
+*.tmp
 os.bxrc
 os-dbg.bxrc

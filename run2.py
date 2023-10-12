@@ -35,4 +35,4 @@ if __name__ == "__main__":
 
     os.system("bochs -f os.bxrc -q")
 
-    get_check_sum("mem.bin")
+    #get_check_sum("mem.bin")

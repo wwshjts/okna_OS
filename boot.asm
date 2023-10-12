@@ -10,7 +10,7 @@ cli
 xor ax, ax				; устанавливаем регистр ax в ноль
 mov	ss, ax				; выбираем сегмент с базой 0 
 mov sp, 0x7C00			; устанавливаем cмещение относительно сегмента
-sti
+
 
 ; регистр ds не определен в начале работы
 
@@ -52,6 +52,15 @@ read_another:
 
 end_read:
 
+lgdt [gdt_descriptor]		; устанавливаем GDTR - регистр, содержащий значение дескриптора GDT
+
+mov eax, cr0				; выставляем бит номер 0 (PE, Protected Mode Enable) в регистре CR0
+or	al, 1
+mov	cr0, eax
+
+jmp CODE_SEG:protected_mode_tramplin + 0x7C00	; Прыжком мы переходим в защищённый 32-битный режим,
+												; но всё ещё находимся в коде, загруженном по адресу 0x7C00
+
 endless_loop:
 	jmp endless_loop
 
@@ -69,7 +78,7 @@ update_chs:
 error:
 	pop ax
 	inc ax
-	cmp ax, 4				; если ошибок менше 4
+	cmp ax, 4				; если ошибок меньше 4
 	push ax
 	jl read_another			; пытаемся прочитать ещё раз
 
@@ -78,6 +87,43 @@ error:
 	int 0x10
 	jmp end_read
 
-times 510-($-$$) db 0	; Добиваем размер загрузочного сектора в 510байт
-dw 0xAA55				; И последние два байта загрузочного сектора в little endian
 
+gdt_start:
+	dq 0x0 					; null descriptor
+	gdt_code:
+		dw 0FFFFh			; лимит
+		dw 0				; база сегмента
+		db 0				; база сегмента
+		db 10011010b		; access byte
+		db 11001111b		; флаги + лимит
+		db 0				; база сегмента
+	gdt_data:
+		dw 0FFFFh
+		dw 0
+		db 0
+		db 10010010b		; также, но executable bit = 0
+		db 11001111b
+		db 0
+		
+gdt_end:
+
+gdt_descriptor:						; Дескриптор GDT
+	dw gdt_end - gdt_start - 1
+	dd gdt_start + 0x20000			; Линейный адрес GDT в копии VBR
+
+CODE_SEG equ gdt_code - gdt_start	; Определение констант
+DATA_SEG equ gdt_data - gdt_start
+
+[BITS 32]
+protected_mode_tramplin:
+	mov ax, 0x2020					; устанавливаем data segment registers
+	mov ds, ax
+
+	xor ax, ax						; устанавливаем стек
+	mov	ss, ax
+	mov sp, 0x2000
+	jmp CODE_SEG:0x20200			; переходим в си
+
+
+times 510-($-$$) db 0		; Добиваем размер загрузочного сектора в 510байт
+dw 0xAA55					; И последние два байта загрузочного сектора в little endian
