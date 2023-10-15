@@ -54,13 +54,9 @@ end_read:
 
 lgdt [gdt_descriptor]		; устанавливаем GDTR - регистр, содержащий значение дескриптора GDT
 
-mov eax, cr0				; выставляем бит номер 0 (PE, Protected Mode Enable) в регистре CR0
-or	al, 1
-mov	cr0, eax
-
 jmp CODE_SEG:protected_mode_tramplin + 0x7C00	; Прыжком мы переходим в защищённый 32-битный режим,
-												; но всё ещё находимся в коде, загруженном по адресу 0x7C00
 
+												; но всё ещё находимся в коде, загруженном по адресу 0x7C00
 endless_loop:
 	jmp endless_loop
 
@@ -116,12 +112,15 @@ DATA_SEG equ gdt_data - gdt_start
 
 [BITS 32]
 protected_mode_tramplin:
-	mov ax, 0x2020					; устанавливаем data segment registers
+	mov eax, CODE_SEG				; устанавливаем data segment registers
 	mov ds, ax
+	mov ss, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
 
 	xor ax, ax						; устанавливаем стек
-	mov	ss, ax
-	mov sp, 0x2000
+	mov esp, 0x20000
 	jmp CODE_SEG:0x20200			; переходим в си
 
 

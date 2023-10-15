@@ -35,8 +35,8 @@ if __name__ == "__main__":
 
     if len(sys.argv) < 2:
         os.system("qemu-system-i386 -monitor stdio -fda boot.img") 
-    elif sys.argv == "-d":
-	    os.system("qemu-system-i386 -fda boot.img -s -S -vnc  &")
+    elif sys.argv[1] == "-d":
+	    os.system("qemu-system-i386 -fda boot.img -s -S -vnc none &")
     else:
         print("Unknown option")
         exit(3)
