@@ -52,7 +52,13 @@ read_another:
 
 end_read:
 
+
 lgdt [gdt_descriptor]		; устанавливаем GDTR - регистр, содержащий значение дескриптора GDT
+
+mov eax, cr0				; выставляем бит номер 0 (PE, Protected Mode Enable) в регистре CR0
+or	al, 1
+mov	cr0, eax
+
 
 jmp CODE_SEG:protected_mode_tramplin + 0x7C00	; Прыжком мы переходим в защищённый 32-битный режим,
 
@@ -112,7 +118,7 @@ DATA_SEG equ gdt_data - gdt_start
 
 [BITS 32]
 protected_mode_tramplin:
-	mov eax, CODE_SEG				; устанавливаем data segment registers
+	mov eax, DATA_SEG				; устанавливаем data segment registers
 	mov ds, ax
 	mov ss, ax
 	mov es, ax
