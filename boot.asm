@@ -24,6 +24,7 @@ mov bx, 0x2000
 mov es, bx				; селектор сегмента чтения 
 xor bx, bx
 ;BIOS устанавливает номер загрузочного диска в регистр dl перед передачей управления VBR
+xor di, di				; количество ошибок
 
 read_another:
 	; всегда обновляем ax т.к. после прерывания он затирается
@@ -32,9 +33,7 @@ read_another:
 	int 0x13
 
 	jc error				; Проверяем на ошибку загрузки
-	pop ax
-	xor ax, ax
-	push ax
+	xor di, di
 
 	inc cl 					; инкрементируем сектор
 	cmp cl, 0x12			; если сектор вышел из диапазона [1; 18]
@@ -46,11 +45,8 @@ read_another:
 	add si, 0x20
 	mov es, si 
 	
-	cmp si, 0x800			; если селктор физический адрес на 0x80000
-	jng end_read			; завершаем чтение
-	jmp read_another		; иначе продолжаем
-
-end_read:
+	cmp si, 0x8000			; если селктор физический адрес <= 0x80000
+	jng read_another		; продолжаем
 
 
 lgdt [gdt_descriptor]		; устанавливаем GDTR - регистр, содержащий значение дескриптора GDT
@@ -61,8 +57,8 @@ mov	cr0, eax
 
 
 jmp CODE_SEG:protected_mode_tramplin + 0x7C00	; Прыжком мы переходим в защищённый 32-битный режим,
-
 												; но всё ещё находимся в коде, загруженном по адресу 0x7C00
+
 endless_loop:
 	jmp endless_loop
 
@@ -78,16 +74,14 @@ update_chs:
 	jmp update_end  		; за его переполнением не следим
 
 error:
-	pop ax
-	inc ax
-	cmp ax, 4				; если ошибок меньше 4
-	push ax
+	inc di
+	cmp di, 4				; если ошибок меньше 4
 	jl read_another			; пытаемся прочитать ещё раз
 
 	mov ah, 0xE				; иначе
 	mov al, '!'
 	int 0x10
-	jmp end_read
+	jmp endless_loop
 
 
 gdt_start:
@@ -106,7 +100,6 @@ gdt_start:
 		db 10010010b		; также, но executable bit = 0
 		db 11001111b
 		db 0
-		
 gdt_end:
 
 gdt_descriptor:						; Дескриптор GDT

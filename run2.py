@@ -31,7 +31,7 @@ if __name__ == "__main__":
         print(f"Kernel is too big {kernel_size}\nrecommend size <{KERNEL_SIZE}")
         exit(1)
     
-    get_check_sum("boot.img")
+    #get_check_sum("boot.img")
 
     os.system("bochs -f os.bxrc -q")
 
