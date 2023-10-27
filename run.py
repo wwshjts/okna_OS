@@ -11,9 +11,8 @@ def get_check_sum(name:str) -> int:
         #Читаем один байт
         byte = fl.read(1)
         while byte:
-            res = (res + int.from_bytes(byte)) % 2**16
+            res = (res + int.from_bytes(byte)) 
             byte = fl.read(1)
-    print(f'Check sum for {name} is {hex(res)}')
     return res
 
 if __name__ == "__main__":
@@ -31,17 +30,24 @@ if __name__ == "__main__":
         print(f"Kernel is too big {kernel_size}\nrecommend size <{KERNEL_SIZE}")
         exit(1)
     
-    get_check_sum("boot.img")
 
     if len(sys.argv) < 2:
         os.system("qemu-system-i386 -monitor stdio -fda boot.img") 
+    if sys.argv[1] == '--cmp':
+        boot_sum = get_check_sum("boot.img")
+        os.system("qemu-system-i386 -monitor stdio -fda boot.img") 
+        mem_sum = get_check_sum("mem.bin")
+        if (boot_sum != mem_sum):
+            print("!> ERROR invalid data read")
+            exit(1)
+        print("The checksums match")
+
     elif sys.argv == "-d":
 	    os.system("qemu-system-i386 -fda boot.img -s -S -vnc  &")
     else:
         print("Unknown option")
         exit(3)
 
-    get_check_sum("mem.bin")
 
     
 
