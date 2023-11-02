@@ -1,17 +1,23 @@
 #define SCREEN_START 0xB8000
-void kernel() {
-  //vga_clear_screen()
-  //vga_print_str("Hello, world!", 32, 12);
 
-  int x, y;
-  init_printer(&x, &y);
-  for (int i = 0; i < 30; i++) {
-    for (int j = 0; j < i; j++) {
-      print(&x, &y, " ", 0);      //!!!
-    }
-    print(&x, &y, "%d\n", i);
-  }
-  for(;;);
+//TODO написать enum для цветов
+enum {BLACK, BLUE, GREEN, CYAN, RED, PURPLE, BROWN, GRAY, DARK_GRAY, LIGHT_BLUE, 
+	LIGHT_GREEN, LIGHT_CYAN, LIGHT_RED, LIGHT_PURPLE, YELLOW, WHITE};
+typedef unsigned char byte; 
+
+void kernel() {
+	//vga_clear_screen()
+	//vga_print_str("Hello, world!", 32, 12);
+
+	int x, y;
+	init_printer(&x, &y);
+	for (int i = 0; i < 30; i++) {
+		for (int j = 0; j < i; j++) {
+			print(&x, &y, " ", 0);      //!!!
+		}
+	print(&x, &y, "%d\n", i);
+	}
+	for(;;);
 }
 
 //0xB8000 + 2*(y*80 + x) - точка (x, y) на экране
@@ -20,15 +26,15 @@ void kernel() {
 
  // очистка экрана
 void vga_clear_screen(){
-  for(int i = 0; i < 4000; i++){          // 4000 = 2 * 25 * 80
-    *((short int*)(SCREEN_START + i)) = 0;
-  }
+	for(int i = 0; i < 4000; i++){          // 4000 = 2 * 25 * 80
+		*((short int*)(SCREEN_START + i)) = 0;
+	}
 }
 
 // печать символа в позиции (x, y)
 void vga_print_char(unsigned char symbol, int x, int y){
-  *((short int*)(SCREEN_START + 2*(y*80 + x))) = symbol;
-  *((short int*)(SCREEN_START + 2*(y*80 + x) + 1)) = 15;
+	*((byte*)(SCREEN_START + 2*(y*80 + x))) = symbol;
+	*((byte*)(SCREEN_START + 2*(y*80 + x) + 1)) = YELLOW;
 }
 
 // печать строки, начиная с позиции (x, y)
@@ -45,9 +51,9 @@ void vga_print_str(unsigned char* str, int x, int y){
 
 //очищает экран и запускает печать с координаты (0, 0)
 void init_printer(int *x, int* y){
-  vga_clear_screen();
-  *x = 0;
-  *y = 0;
+	vga_clear_screen();
+	*x = 0;
+	*y = 0;
 }
 
 void update_x_y(int* x, int* y){
