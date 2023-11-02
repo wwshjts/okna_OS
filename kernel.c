@@ -15,13 +15,15 @@ void kernel() {
 	//vga_print_str("Hello, world!", 32, 12);
 	int x, y;
 	init_printer(&x, &y);
-	x++;
+	print(&x, &y, "%d is good %x is better %s", 12, 12, "Hello, world");
+	/*
 	for (int i = 0; i < 25; i++) {
 		for (int j = 0; j < i; j++) {
 			print(&x, &y, " ", 0);      //!!!
 		}
 	print(&x, &y, "%d\n", i);
 	}
+	*/
 	for(;;);
 }
 
@@ -41,7 +43,7 @@ void vga_clear_screen(){
 // печать символа в позиции (x, y)
 void vga_print_char(unsigned char symbol, int x, int y){
 	*((byte*)(to_address(x,y))) = symbol;
-	*((byte*)(to_address(x,y) + 1)) = YELLOW;
+	*((byte*)(to_address(x,y) + 1)) = WHITE;
 }
 
 // печать строки, начиная с позиции (x, y)
@@ -70,15 +72,15 @@ void update_x_y(int* x, int* y){
   if ((*y) > 24){
     (*y)--;
     for(int i = 0; i < 3840; i++){
-      *((short int*)(SCREEN_START + i)) = *((short int*)(SCREEN_START + i + 160));
+      *((hword*)(SCREEN_START + i)) = *((hword*)(SCREEN_START + i + 160));
     }
     for(int i = 3840; i < 4000; i++){
-      *((short int*)(SCREEN_START + i)) = 0;
+      *((hword*)(SCREEN_START + i)) = 0;
     }
   }
   //TODO понять что это такое
-  *((short int*)(SCREEN_START + 2*((*y)*80 + (*x)))) = '|';
-  *((short int*)(SCREEN_START + 2*((*y)*80 + (*x)) + 1)) = 143;
+  //*((hword*)(SCREEN_START + 2*((*y)*80 + (*x)))) = '|';
+  //*((hword*)(SCREEN_START + 2*((*y)*80 + (*x)) + 1)) = 143;
 }
 
 void print_num(int* x, int* y, int n){
@@ -115,7 +117,41 @@ void print_hex(int* x, int* y, int n){
 //printf c ограниченным набором спецификаторов формата
 //%s - строка, %d - 32-битное десятичное, %x - 32-битное шестнадцатиричное
 //При достижении конца экрана текст сдвигается вверх на одну строку
-void print(int* x, int* y, unsigned char* fmt, int n){//va_list
+
+//TODO реализовать нормальный va_list
+void print(int* x, int* y, byte* fmt, ...){//va_list
+	byte** arg_ptr = &fmt + 1;
+	byte arg_flag = 0;
+	while(*fmt) {
+		if( (*fmt == '%') && (*(fmt + 1))){
+			fmt++;
+			switch (*fmt){
+				case 'd':
+					print_num(x, y, *(arg_ptr));
+					arg_ptr++;
+				break;
+				case 'x':
+					print_hex(x,y, *(arg_ptr));
+					arg_ptr++;
+				break;
+				case 's':
+					byte* str = *arg_ptr;
+					while(*str){
+						vga_print_char(*(str++), *x, *y);
+						update_x_y(x,y);
+					}
+					arg_ptr++;
+				break;
+				//TODO подумать над % без экранирования
+			}
+		}
+		else{
+			vga_print_char(*fmt, *x, *y);
+			update_x_y(x, y);
+		}
+		fmt++;
+	}
+	/*
   for(int i = 0; fmt[i] != 0; i++){
     switch (fmt[i]){
     case '%':
@@ -123,18 +159,22 @@ void print(int* x, int* y, unsigned char* fmt, int n){//va_list
       if (fmt[i] != 0){
         switch (fmt[i]){
         case 's':
-          /*for(int j = 0; n[j] != 0; j++){
-            vga_print_char(n[j], *x, *y);
+			byte* str = *(arg_ptr + args);
+          for(int j = 0; str[j] != 0; j++){
+            vga_print_char(str[j], *x, *y);
             update_x_y(x, y);
-          }*/
+          }
+			args++;
           break;
 
         case 'd':
-          print_num(x, y, n);
+          print_num(x, y, *(arg_ptr + args));
+		  args += 1;
           break;
 
         case 'x':
-          print_hex(x, y, n);
+          print_hex(x, y, *(arg_ptr + args));
+			args+=1;
           break;
 
         default:
@@ -164,4 +204,5 @@ void print(int* x, int* y, unsigned char* fmt, int n){//va_list
       break;
     }
   }
+  */
 }
