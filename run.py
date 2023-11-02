@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
     if len(sys.argv) < 2:
         os.system("qemu-system-i386 -monitor stdio -fda boot.img") 
-    if sys.argv[1] == '--cmp':
+    elif sys.argv[1] == '--cmp':
         boot_sum = get_check_sum("boot.img")
         os.system("qemu-system-i386 -monitor stdio -fda boot.img") 
         mem_sum = get_check_sum("mem.bin")
