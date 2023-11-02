@@ -1,17 +1,22 @@
 #define SCREEN_START 0xB8000
+//screen size in hword (2 byte)
+#define SCREEN_SIZE 4000 
+#define WIDTH 80
+#define HEIGHT 25
 
-//TODO написать enum для цветов
 enum {BLACK, BLUE, GREEN, CYAN, RED, PURPLE, BROWN, GRAY, DARK_GRAY, LIGHT_BLUE, 
 	LIGHT_GREEN, LIGHT_CYAN, LIGHT_RED, LIGHT_PURPLE, YELLOW, WHITE};
+
 typedef unsigned char byte; 
+typedef unsigned short int hword;
 
 void kernel() {
 	//vga_clear_screen()
 	//vga_print_str("Hello, world!", 32, 12);
-
 	int x, y;
 	init_printer(&x, &y);
-	for (int i = 0; i < 30; i++) {
+	x++;
+	for (int i = 0; i < 25; i++) {
 		for (int j = 0; j < i; j++) {
 			print(&x, &y, " ", 0);      //!!!
 		}
@@ -23,18 +28,20 @@ void kernel() {
 //0xB8000 + 2*(y*80 + x) - точка (x, y) на экране
 //Кодировка отображения символа - 1 бит мигание, 3 бита цвет заднего фона, 4 переднего, 8 кодa символа
 //80 - столбцов 25 - строчек
-
+int to_address(int x, int y){
+	return SCREEN_START + 2*(y*WIDTH + x);
+}
  // очистка экрана
 void vga_clear_screen(){
-	for(int i = 0; i < 4000; i++){          // 4000 = 2 * 25 * 80
-		*((short int*)(SCREEN_START + i)) = 0;
+	for(int i = 0; i < SCREEN_SIZE; i++){          // 4000 = 2 * 25 * 80
+		*((hword*)(SCREEN_START + i)) = 0;
 	}
 }
 
 // печать символа в позиции (x, y)
 void vga_print_char(unsigned char symbol, int x, int y){
-	*((byte*)(SCREEN_START + 2*(y*80 + x))) = symbol;
-	*((byte*)(SCREEN_START + 2*(y*80 + x) + 1)) = YELLOW;
+	*((byte*)(to_address(x,y))) = symbol;
+	*((byte*)(to_address(x,y) + 1)) = YELLOW;
 }
 
 // печать строки, начиная с позиции (x, y)
@@ -58,10 +65,8 @@ void init_printer(int *x, int* y){
 
 void update_x_y(int* x, int* y){
   (*x)++;
-  if ((*x) > 79){
-    (*x) -= 79;
-    (*y)++;
-  }
+  *y += (*x) / WIDTH; //x out of line
+  *x = *x % WIDTH;
   if ((*y) > 24){
     (*y)--;
     for(int i = 0; i < 3840; i++){
@@ -71,6 +76,7 @@ void update_x_y(int* x, int* y){
       *((short int*)(SCREEN_START + i)) = 0;
     }
   }
+  //TODO понять что это такое
   *((short int*)(SCREEN_START + 2*((*y)*80 + (*x)))) = '|';
   *((short int*)(SCREEN_START + 2*((*y)*80 + (*x)) + 1)) = 143;
 }
