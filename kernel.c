@@ -13,7 +13,6 @@ typedef unsigned short int hword;
 int x, y;
 
 void kernel() {
-    //TODO x y  - global
     init_printer();
     //print(&x, &y, "%d is good %x is better %s", 12, 12, "Hello, world");
     for (int i = 0; i < 30; i++) {
@@ -74,8 +73,7 @@ void update_x_y(){
     x++;
     y += (x) / WIDTH; //x out of line
     x = x % WIDTH;
-
-    if (y > 24){
+    if (y / HEIGHT){
         y--;
         memcpy(2*WIDTH, 0, SCREEN_SIZE - 2*WIDTH);
         memzero(SCREEN_SIZE - 2*WIDTH, 2*WIDTH);
@@ -128,15 +126,17 @@ void print(char* fmt, ...){
             case 's':
                 vga_print_str(*(arg_ptr++));
             break;
+            case '%':
+                vga_print_char(*(fmt));
+            break;
             //TODO подумать над % без экранирования
             }
         }
         else if (*fmt == '\n'){
-            //TODO вот тут чето страшное
             *((hword*)(to_address())) = 0;
             y++;
             x = -1;
-            update_x_y(x, y);
+            update_x_y();
         }else{
            vga_print_char(*fmt);
         }
