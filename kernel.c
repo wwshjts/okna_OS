@@ -7,14 +7,14 @@
 enum {BLACK, BLUE, GREEN, CYAN, RED, PURPLE, BROWN, GRAY, DARK_GRAY, LIGHT_BLUE, 
     LIGHT_GREEN, LIGHT_CYAN, LIGHT_RED, LIGHT_PURPLE, YELLOW, WHITE};
 
-typedef unsigned char byte; 
+typedef unsigned char byte;
 typedef unsigned short int hword;
 
 int x, y;
 
 void kernel() {
     init_printer();
-    //print(&x, &y, "%d is good %x is better %s", 12, 12, "Hello, world");
+    //print("%d is good %x is better %s\n", 12, 12, "Hello, world");
     for (int i = 0; i < 30; i++) {
         for (int j = 0; j < i; j++) {
             print(" ");
@@ -24,15 +24,15 @@ void kernel() {
     for(;;);
 }
 
-void memzero(int start, int size){
-    for(int i = 0; i < size; i += 2){
-        *((hword*)(SCREEN_START + start + i)) = 0;
+void memzero(byte* start, int size){
+    for(int i = 0; i < size; i++){
+        *(start + i) = 0;
     }
 }
 
-void memcpy(int form, int to, int size){
-    for(int i = 0; i < size; i += 2){
-        *((hword*)(SCREEN_START + to + i)) = *((hword*)(SCREEN_START + form + i));
+void memcpy(byte* from, byte* to, int size){
+    for(int i = 0; i < size; i++){
+        *(to + i) = *(from + i);
     }
 }
 
@@ -42,9 +42,10 @@ void memcpy(int form, int to, int size){
 int to_address(){
     return SCREEN_START + 2*(y*WIDTH + x);
 }
- // очистка экрана
+
+// очистка экрана
 void vga_clear_screen(){
-    memzero(0, SCREEN_SIZE);
+    memzero((byte*)SCREEN_START, SCREEN_SIZE);
 }
 
 // печать символа в позиции (x, y)
@@ -75,8 +76,8 @@ void update_x_y(){
     x = x % WIDTH;
     if (y / HEIGHT){
         y--;
-        memcpy(2*WIDTH, 0, SCREEN_SIZE - 2*WIDTH);
-        memzero(SCREEN_SIZE - 2*WIDTH, 2*WIDTH);
+        memcpy(((byte*)(SCREEN_START + 2*WIDTH)), ((byte*)SCREEN_START), SCREEN_SIZE - 2*WIDTH);
+        memzero(((byte*)SCREEN_START + SCREEN_SIZE - 2*WIDTH), 2*WIDTH);
     }
 }
 
@@ -88,7 +89,7 @@ void print_num(int n){
     if (n > 9){
         print_num(n / 10);
     }
-    vga_print_char((n % 10) + 48);
+    vga_print_char((n % 10) + '0');
 }
 
 void print_hex(int n){
@@ -101,7 +102,7 @@ void print_hex(int n){
     }
     int a = n % 16;
     if (a > 9){
-        vga_print_char(a + 'a');
+        vga_print_char(a + 'a' - 10);
     }else{
         vga_print_char(a + '0');
     }
