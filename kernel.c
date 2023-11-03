@@ -46,6 +46,12 @@ void vga_print_char(char symbol){
     update_x_y();
 }
 
+void vga_print_str(char* str){
+    while(*str){
+        vga_print_char(*(str++));
+    }
+}
+
 // печать строки, начиная с позиции (x, y)
 //очищает экран и запускает печать с координаты (0, 0)
 void init_printer(){
@@ -100,9 +106,8 @@ void print_hex(int n){
 //%s - строка, %d - 32-битное десятичное, %x - 32-битное шестнадцатиричное
 //При достижении конца экрана текст сдвигается вверх на одну строку
 //TODO реализовать нормальный va_list
-void print(byte* fmt, ...){
-    byte** arg_ptr = &fmt + 1;
-    byte arg_flag = 0;	
+void print(char* fmt, ...){
+    char** arg_ptr = &fmt + 1;
     while(*fmt) {
         if( (*fmt == '%') && (*(fmt + 1))){
             fmt++;
@@ -114,11 +119,7 @@ void print(byte* fmt, ...){
                 print_hex(*(arg_ptr++));
             break;
             case 's':
-                byte* str = *arg_ptr;
-                while(*str){
-                    vga_print_char(*(str++));
-                }
-                arg_ptr++;
+                vga_print_str(*(arg_ptr++));
             break;
             //TODO подумать над % без экранирования
             }
