@@ -267,16 +267,15 @@ void make_idt(byte* idt_address){
     for(int vector = 0; vector < IDT_SIZE; vector++){
         byte* handler = tramplins[vector];
         hword low_shift = (hword) handler;
-        hword high_shift = (hword)((word) handler >> 16);
+        hword high_shift = (hword) (((word) handler) >> 16);
         idt[vector].low_shift = low_shift;
         idt[vector].high_shift = high_shift;
         idt[vector].selector = 1; //data segment
-        idt[vector].info = 0xE; //interrupt gate, so dpl = 0
+        idt[vector].info = 0x8E; //interrupt gate, so dpl = 0
     }
 }
 
 void make_idtr(byte* idt, byte* idtr){
     *((hword*)idtr) = IDT_SIZE * sizeof(gate_descriptor) - 1;
-    *((word*)(idtr + 1)) = (word)idt;
-
+    *((word*)(idtr + 2)) = (word)idt;
 }
