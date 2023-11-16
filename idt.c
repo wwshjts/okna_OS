@@ -3,7 +3,7 @@
 static void panic_handler(int vector){
     kernel_panic("unhandled interrupt %x", vector);
 }
-static void tramplin_00() {panic_handler(0x00);}
+void tramplin_00() {panic_handler(0x00);}
 static void tramplin_01() {panic_handler(0x01);}
 static void tramplin_02() {panic_handler(0x02);}
 static void tramplin_03() {panic_handler(0x03);}

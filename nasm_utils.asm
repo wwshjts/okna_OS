@@ -20,7 +20,8 @@ kernel_panic:
         jmp loop
 
 _load_idtr:
-    lidt [esp+4]
+    mov ebx, [esp+4]
+    lidt [ebx]
     ret
 
 _interupt:

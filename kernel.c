@@ -13,6 +13,7 @@ void _load_idtr(byte*);
 void _interupt();
 
 void kernel() {
+    init_printer();
     byte* idt = kernel_calloc(IDT_SIZE, sizeof(gate_descriptor));
     make_idt(idt);
     byte* idtr = kernel_malloc(sizeof(word) + sizeof(hword));
@@ -25,6 +26,7 @@ void kernel() {
         }
         print("%d\n", i);
     }*/
-    _interupt();
+    int i = 1/0;
+    //_interupt();
     for(;;);
 }
