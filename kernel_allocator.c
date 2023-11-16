@@ -7,18 +7,20 @@ static byte* stop = (byte*) STOP_ADR;
 static byte* offset = (byte*) START_ADR;
 
 byte* kernel_malloc(word size){
-    if(offset + size >= stop){
+    //TODO
+    /*if(offset + size >= stop){
         return NULL;
-    }
+    }*/
     byte* res = offset;
     offset += size;
     return res;
 }
 
 byte* kernel_calloc(word n, word size){
+    /*TODO
     if(offset + n * size >= stop){
         return NULL;
-    }
+    }*/
     byte* res = offset;
     offset += n * size;
     return res;
@@ -28,7 +30,5 @@ byte* kernel_realloc(void* old_addr, word new_size){
     return kernel_malloc(new_size);
 }
 
-void kernel_free(void* addr){
-    offset = start;
-}
+void kernel_free(void* addr){}
 
