@@ -1,6 +1,5 @@
 #include"idt.h"
 
-static void kernel_panic(const char* fmt, int vector) {}
 static void panic_handler(int vector){
     kernel_panic("unhandled interrupt %x", vector);
 }

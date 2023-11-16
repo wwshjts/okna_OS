@@ -16,3 +16,4 @@ typedef struct{
 
 void make_idt(byte* idt);
 void make_idtr(byte* idt, byte* idtr);
+static void kernel_panic(const char* fmt, int vector); 

@@ -1,6 +1,6 @@
 .PHONY: all clear
 
-obj = utils.o vga_print.o kernel_allocator.o idt.o 
+obj = utils.o vga_print.o kernel_allocator.o idt.o nasm_utils.o
 
 all: boot
 
@@ -9,7 +9,7 @@ boot: boot.bin kernel.bin
 	dd if=boot.bin of=boot.img conv=notrunc
 	dd if=kernel.bin of=boot.img conv=notrunc seek=1
 
-kernel.bin: kernel.c utils.o vga_print.o idt.o
+kernel.bin: kernel.c $(obj) 
 	gcc -m32 -ffreestanding -c -o  kernel.o -fno-pic kernel.c 
 	ld -m i386pe -o kernel.tmp -Ttext 0x20200 kernel.o $(obj)
 	objcopy -I pe-i386 -O binary kernel.tmp kernel.bin
@@ -25,6 +25,9 @@ kernel_allocator.o: kernel_allocator.c
 
 idt.o : idt.c
 	gcc -m32 -ffreestanding -c -o  idt.o -fno-pic idt.c
+
+nasm_utils.o : nasm_utils.asm
+	nasm -felf nasm_utils.asm -o nasm_utils.o
 
 boot.bin: boot.asm
 	nasm -fbin boot.asm -o boot.bin
