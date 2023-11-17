@@ -8,9 +8,10 @@
 #include"vga_print.h"
 #include"idt.h"
 #include"kernel_allocator.h"
-void _load_idtr(byte*);
-void _interupt();
-void _cli();
+void load_idtr(byte*);
+void interupt();
+void cli();
+void sti();
 
 void kernel() {
     init_printer();
@@ -20,7 +21,7 @@ void kernel() {
     make_idt(idt, trmps);
     byte* idtr = kernel_malloc(sizeof(word) + sizeof(hword));
     make_idtr(idt, idtr);
-    _load_idtr(idtr);
+    load_idtr(idtr);
     for (int i = 0; i < 30; i++) {
         for (int j = 0; j < i; j++) {
             print(" ");
@@ -29,6 +30,6 @@ void kernel() {
     }
     //int i = 1/0;
     //_interupt();
-    _cli();
+    sti();
     for(;;);
 }
