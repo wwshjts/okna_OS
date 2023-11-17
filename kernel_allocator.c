@@ -1,7 +1,6 @@
 #include"stddef.h" 
 #include"types.h"
 #include"utils.h"
-static void kernel_panic(const char* fmt, int vector);
 #define START_ADR 0x100000
 #define STOP_ADR 0x400000
 static byte* start = (byte*) START_ADR;

@@ -1,4 +1,5 @@
-#ifndef _TYPES_H #include"types.h"
+#ifndef _TYPES_H 
+    #include"types.h"
 #endif
 
 #ifndef _UTILS_H
@@ -10,8 +11,6 @@
 #include"kernel_allocator.h"
 void load_idtr(byte*);
 void interupt();
-void cli();
-void sti();
 
 void kernel() {
     init_printer();

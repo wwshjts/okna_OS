@@ -2,8 +2,6 @@
     #include"types.h"
 #endif
 #define IDT_SIZE 256
-//TODO литл эндиан?
-//TODO поля меньше байта?
 #pragma pack(push, 1)
 typedef struct{
     hword low_shift;
@@ -17,4 +15,3 @@ typedef struct{
 void make_tramplins(void** ptr);
 void make_idt(byte* idt, void** tramplins);
 void make_idtr(byte* idt, byte* idtr);
-static void kernel_panic(const char* fmt, int vector); 
