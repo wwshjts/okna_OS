@@ -1,15 +1,11 @@
-#ifndef _TYPES_H 
-    #include"types.h"
-#endif
+#include "types.h"
+#include "utils.h"
+#include "vga_print.h"
+#include "idt.h"
+#include "kernel_allocator.h"
 
-#ifndef _UTILS_H
-    #include"utils.h"
-#endif
-
-#include"vga_print.h"
-#include"idt.h"
-#include"kernel_allocator.h"
 void load_idtr(byte*);
+
 void interupt();
 
 void kernel() {
@@ -28,7 +24,6 @@ void kernel() {
         print("%d\n", i);
     }
     //int i = 1/0;
-    //_interupt();
-    sti();
+    //interupt();
     for(;;);
 }

@@ -1,4 +1,6 @@
-#define _TYPES_H
-typedef unsigned char byte;
-typedef unsigned short int hword;
-typedef unsigned int word;
+#ifndef _TYPES_H
+    #define _TYPES_H
+    typedef unsigned char byte;
+    typedef unsigned short int hword;
+    typedef unsigned int word;
+#endif
