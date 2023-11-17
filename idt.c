@@ -1,8 +1,28 @@
-#include"idt.h"
+#include "idt.h"
+#include "utils.h"
+#include "kernel_allocator.h"
+
+#define IDT_SIZE 256
+
+#pragma pack(push, 1)
+typedef struct{
+    hword low_shift;
+    hword selector;
+    byte space;
+    byte info;
+    hword high_shift;
+} gate_descriptor;
+#pragma pack(pop)
+
+
+static gate_descriptor* idt;
+
+static void load_idtr(byte*);
 
 static void panic_handler(int vector){
     kernel_panic("unhandled interrupt %x", vector);
 }
+
 static void tramplin_00() {panic_handler(0x00);}
 static void tramplin_01() {panic_handler(0x01);}
 static void tramplin_02() {panic_handler(0x02);}
@@ -260,8 +280,10 @@ static void tramplin_FD() {panic_handler(0xFD);}
 static void tramplin_FE() {panic_handler(0xFE);}
 static void tramplin_FF() {panic_handler(0xFF);}
 
+void** tramplins;
 
-void make_tramplins (void** tramplins) {
+static void make_tramplins () {
+    tramplins = kernel_calloc(IDT_SIZE, sizeof(gate_descriptor));
     tramplins[0x00] = tramplin_00;
     tramplins[0x01] = tramplin_01;
     tramplins[0x02] = tramplin_02;
@@ -520,21 +542,23 @@ void make_tramplins (void** tramplins) {
     tramplins[0xFF] = tramplin_FF;
 }
 
-//TODO варнинги
-void make_idt(byte* idt_address, void** tramplins){
-gate_descriptor* idt = (gate_descriptor*)idt_address;
-for(int vector = 0; vector < IDT_SIZE; vector++){
-    byte* handler = tramplins[vector];
-    hword low_shift = (hword) handler;
-    hword high_shift = (hword) (((word) handler) >> 16);
-    idt[vector].low_shift = low_shift;
-    idt[vector].high_shift = high_shift;
-    idt[vector].selector = 8; //data segment
-    idt[vector].info = 0x8E; //interrupt gate, so dpl = 0
-}
+void make_idt() {
+    make_tramplins();
+    idt = (gate_descriptor*) kernel_malloc(IDT_SIZE * sizeof(gate_descriptor));
+    for(int vector = 0; vector < IDT_SIZE; vector++){
+        byte* handler = tramplins[vector];
+        hword low_shift = (hword) handler;
+        hword high_shift = (hword) (((word) handler) >> 16);
+        idt[vector].low_shift = low_shift;
+        idt[vector].high_shift = high_shift;
+        idt[vector].selector = 8; //data segment
+        idt[vector].info = 0x8E; //interrupt gate, so dpl = 0
+    }
 }
 
-void make_idtr(byte* idt, byte* idtr){
-*((hword*)idtr) = IDT_SIZE * sizeof(gate_descriptor) - 1;
-*((word*)(idtr + 2)) = (word)idt;
+void make_idtr(){
+    byte* idtr = kernel_malloc(sizeof(hword) + sizeof(word));
+    *((hword*)idtr) = IDT_SIZE * sizeof(gate_descriptor) - 1;
+    *((word*)(idtr + 2)) = (word)idt;
+    load_idtr(idtr);
 }
