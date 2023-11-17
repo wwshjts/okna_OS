@@ -3,6 +3,7 @@
 [GLOBAL _load_idtr]
 [GLOBAL kernel_panic]
 [GLOBAL _interupt]
+[GLOBAL _cli]
 [EXTERN init_printer]
 [EXTERN print]
 
@@ -26,3 +27,6 @@ _load_idtr:
 
 _interupt:
     INT 0x42
+
+_cli:
+    sti

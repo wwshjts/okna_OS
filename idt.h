@@ -14,7 +14,7 @@ typedef struct{
 } gate_descriptor;
 #pragma pack(pop)
 
-void make_idt(byte* idt);
+void make_tramplins(void** ptr);
+void make_idt(byte* idt, void** tramplins);
 void make_idtr(byte* idt, byte* idtr);
-void tramplin_00();
 static void kernel_panic(const char* fmt, int vector); 
