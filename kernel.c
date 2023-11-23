@@ -7,8 +7,11 @@
 void interupt();
 
 void kernel() {
+    init_printer();
     make_idt();
     make_idtr();
-    interupt();
+    initialize_intel_8259A();
+    sti();
+    void interupt();
     for(;;);
 }
