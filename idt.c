@@ -5,7 +5,7 @@
 #define IDT_SIZE 256
 
 #pragma pack(push, 1)
-typedef struct{
+typedef struct {
     hword low_shift;
     hword selector;
     byte space;
@@ -19,7 +19,7 @@ static gate_descriptor* idt;
 
 static void load_idtr(byte*);
 
-static void panic_handler(int vector){
+static void panic_handler(int vector) {
     kernel_panic("unhandled interrupt %x", vector);
 }
 
@@ -280,10 +280,9 @@ static void tramplin_FD() {panic_handler(0xFD);}
 static void tramplin_FE() {panic_handler(0xFE);}
 static void tramplin_FF() {panic_handler(0xFF);}
 
-void** tramplins;
-
-static void make_tramplins () {
-    tramplins = kernel_calloc(IDT_SIZE, sizeof(gate_descriptor));
+void make_idt() {
+    //make_tramplins();
+    static void** tramplins[256];     
     tramplins[0x00] = tramplin_00;
     tramplins[0x01] = tramplin_01;
     tramplins[0x02] = tramplin_02;
@@ -540,10 +539,7 @@ static void make_tramplins () {
     tramplins[0xFD] = tramplin_FD;
     tramplins[0xFE] = tramplin_FE;
     tramplins[0xFF] = tramplin_FF;
-}
 
-void make_idt() {
-    make_tramplins();
     idt = (gate_descriptor*) kernel_malloc(IDT_SIZE * sizeof(gate_descriptor));
     for(int vector = 0; vector < IDT_SIZE; vector++){
         byte* handler = tramplins[vector];
