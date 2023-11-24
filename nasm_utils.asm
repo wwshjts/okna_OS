@@ -28,8 +28,8 @@ _sti:
 ; читает байт из порта с номером DX
 _inb:
     mov dx, [esp+4]
+    xor eax, eax
     in al, dx
-    ; TODO: ret val
     ret
 
 ; пишет байт в порт с номером DX

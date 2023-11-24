@@ -12,6 +12,6 @@ void kernel() {
     make_idtr();
     initialize_intel_8259A();
     sti();
-    void interupt();
+    //interupt();
     for(;;);
 }
