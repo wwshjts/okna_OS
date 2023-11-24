@@ -547,8 +547,9 @@ void make_idt() {
         hword high_shift = (hword) (((word) handler) >> 16);
         idt[vector].low_shift = low_shift;
         idt[vector].high_shift = high_shift;
-        idt[vector].selector = 8; //data segment
-        idt[vector].info = 0x8E; //interrupt gate, so dpl = 0
+        idt[vector].selector = 8;// code segment
+        idt[vector].info = 0x8E; // interrupt gate, so dpl = 0
+        idt[vector].space = 0;   // space should be 0x0
     }
 }
 
