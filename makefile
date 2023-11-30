@@ -1,6 +1,6 @@
 .PHONY: all clear
 
-obj = utils.o vga_print.o kernel_allocator.o idt.o nasm_utils.o
+obj = utils.o vga_print.o kernel_allocator.o idt.o nasm_utils.o intel_8259A.o
 
 all: boot
 
@@ -25,6 +25,9 @@ kernel_allocator.o: kernel_allocator.c
 
 idt.o : idt.c
 	gcc -m32 -ffreestanding -c -o  idt.o -fno-pic idt.c
+
+intel_8259A.o : intel_8259A.c
+	gcc -m32 -ffreestanding -c -o  intel_8259A.o -fno-pic intel_8259A.c
 
 nasm_utils.o : nasm_utils.asm
 	nasm -felf nasm_utils.asm -o nasm_utils.o

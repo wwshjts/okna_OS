@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "vga_print.h"
 #include "idt.h"
+#include "intel_8259A.h"
 #include "kernel_allocator.h"
 
 void interupt();

@@ -22,7 +22,7 @@ byte* kernel_calloc(word n, word size){
         kernel_panic("Run out of memory", OUT_OF_MEM_CODE);
     }
     byte* res = offset;
-    memzero(res, size);
+    memzero(res, n * size);
     offset += n * size;
     return res;
 }

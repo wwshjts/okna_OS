@@ -6,7 +6,6 @@
 [GLOBAL _cli]
 [GLOBAL _outb]
 [GLOBAL _inb]
-[GLOBAL _interupt]
 
 _load_idtr:
     mov ebx, [esp+4]
@@ -25,14 +24,11 @@ _sti:
     sti
     ret
 
-; читает байт из порта с номером DX
 _inb:
     mov dx, [esp+4]
-    xor eax, eax
     in al, dx
     ret
 
-; пишет байт в порт с номером DX
 _outb:
     mov dx, [esp+4]
     mov al, [esp+8]
