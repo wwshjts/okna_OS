@@ -9,7 +9,7 @@
 
 void initialize_intel_8259A(){
     outb(MASTER_COMMAND, 0b00010001); //ICW1
-    outb(DIAGNOSTIC_PORT_BIOS, 0); //Синхронизация
+    outb(DIAGNOSTIC_PORT_BIOS, 0); //Synchronization
     outb(MASTER_DATA, 0x20); //ICW2
     outb(DIAGNOSTIC_PORT_BIOS, 0);
     outb(MASTER_DATA, 0b00000100); //ICW3
@@ -24,6 +24,31 @@ void initialize_intel_8259A(){
     outb(DIAGNOSTIC_PORT_BIOS, 0);
     outb(SLAVE_DATA, 0b00000001); //ICW4
 
-    outb(0x21, 0b11111001); //маска IRQ
-    outb(0xA1, 0b11111111); // 0 - включён, 1 - выключен
+    outb(MASTER_DATA, 0b11111011); //mask IRQ
+    outb(SLAVE_DATA, 0b11111111); // 1 - turn off, 0 - turn on
+}
+
+//change: 1 - turn on, 0 - turn of
+void changeDevice(enum Device device, int change){
+    int shift;
+    hword port = MASTER_DATA;
+    switch (device){
+    case Timer:
+        shift = 0;
+        break;
+    case Keyboard:
+        shift = 1;
+        break;
+    case Slave:
+        shift = 2;
+        break;
+    }
+    byte mask = inb(MASTER_DATA);
+    if ((mask >> shift) & 1 == change){
+        if (change){
+            outb(port, mask - (1 << shift));
+        } else {
+            outb(port, mask + (1 << shift));
+        }
+    }
 }

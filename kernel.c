@@ -13,6 +13,7 @@ void kernel() {
     make_idtr();
     initialize_intel_8259A();
     sti();
+    changeDevice(Keyboard, 1);
     //interupt();
     for(;;);
 }
