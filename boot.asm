@@ -119,6 +119,5 @@ protected_mode_tramplin:
 	mov esp, 0x20000
 	jmp CODE_SEG:0x20200			; переходим в си
 
-
 times 510-($-$$) db 0		; Добиваем размер загрузочного сектора в 510байт
 dw 0xAA55					; И последние два байта загрузочного сектора в little endian
