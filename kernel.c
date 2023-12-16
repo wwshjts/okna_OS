@@ -1,7 +1,7 @@
 #include "types.h"
 #include "utils.h"
 #include "vga_print.h"
-#include "idt.h"
+#include "interrupts.h"
 #include "intel_8259A.h"
 #include "kernel_allocator.h"
 

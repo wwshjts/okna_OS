@@ -1,8 +1,9 @@
-#include "idt.h"
 #include "utils.h"
 #include "kernel_allocator.h"
 
 #define IDT_SIZE 256
+#define INTERRUPT_GATE 0xE
+#define TRAP_GATE 0xF
 
 #pragma pack(push, 1)
 typedef struct{
@@ -13,7 +14,6 @@ typedef struct{
     hword high_shift;
 } gate_descriptor;
 #pragma pack(pop)
-
 
 static gate_descriptor* idt;
 
@@ -552,6 +552,12 @@ void make_idt() {
         idt[vector].low_shift = low_shift;
         idt[vector].high_shift = high_shift;
         idt[vector].selector = 8; //code segment
+        // if exception
+        if (vector < 0x20) {
+            idt[vector].info = 0b10000000 + TRAP_GATE;
+        } else {
+            idt[vector].info = 0b10000000 + INTERRUPT_GATE;
+        }
         idt[vector].info = 0b10001110; //interrupt gate, so dpl = 0
         idt[vector].space = 0;
     }

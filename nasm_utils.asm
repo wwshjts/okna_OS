@@ -1,35 +1,35 @@
 [BITS 32]
 
-[GLOBAL _load_idtr]
-[GLOBAL _interupt]
-[GLOBAL _sti]
-[GLOBAL _cli]
-[GLOBAL _outb]
-[GLOBAL _inb]
+[GLOBAL load_idtr]
+[GLOBAL interupt]
+[GLOBAL sti]
+[GLOBAL cli]
+[GLOBAL outb]
+[GLOBAL inb]
 
-_load_idtr:
+load_idtr:
     mov ebx, [esp+4]
     lidt [ebx]
     ret
 
-_interupt:
+interupt:
     INT 0x42
     ret
 
-_cli:
+cli:
     cli
     ret
 
-_sti:
+sti:
     sti
     ret
 
-_inb:
+inb:
     mov dx, [esp+4]
     in al, dx
     ret
 
-_outb:
+outb:
     mov dx, [esp+4]
     mov al, [esp+8]
     out dx, al

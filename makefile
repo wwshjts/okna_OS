@@ -1,6 +1,6 @@
 .PHONY: all clear
 
-obj = utils.o vga_print.o kernel_allocator.o idt.o nasm_utils.o intel_8259A.o
+obj = utils.o vga_print.o kernel_allocator.o interrupts.o nasm_utils.o intel_8259A.o
 
 all: boot
 
@@ -23,8 +23,8 @@ vga_print.o: vga_print.c
 kernel_allocator.o: kernel_allocator.c
 	gcc -m32 -ffreestanding -c -o  kernel_allocator.o -fno-pic kernel_allocator.c
 
-idt.o : idt.c
-	gcc -m32 -ffreestanding -c -o  idt.o -fno-pic idt.c
+interrupts.o : interrupts.c
+	gcc -m32 -ffreestanding -c -o  interrupts.o -fno-pic interrupts.c
 
 intel_8259A.o : intel_8259A.c
 	gcc -m32 -ffreestanding -c -o  intel_8259A.o -fno-pic intel_8259A.c
