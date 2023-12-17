@@ -30,7 +30,6 @@ void panic(context *ctx){
     print("EDX = %x\n", ctx->edx);
     print("EBX = %x\n", ctx->ebx);
     print("ESI = %x\n", ctx->esi);
-    print("ESI = %x\n", ctx->esi);
     print("EDI = %x\n", ctx->edi);
     print("EBP = %x\n", ctx->ebp);
     print("ESP = %x\n", ctx->esp);
@@ -41,6 +40,12 @@ void panic(context *ctx){
     print("GS = %x\n", ctx->gs);
     print("EFLAGS (interrupted) = %x\n", ctx->eflags);
     for(;;);
+}
+
+word timer = 0;
+void timer_interrupt() {
+    print("%d ", timer);
+    timer++;
 }
 
 void make_idt() {
@@ -59,7 +64,6 @@ void make_idt() {
         } else {
             idt[vector].info = 0b10000000 + INTERRUPT_GATE;
         }
-        idt[vector].info = 0b10001110; //interrupt gate, so dpl = 0
         idt[vector].space = 0;
     }
 }

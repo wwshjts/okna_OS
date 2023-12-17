@@ -6,6 +6,7 @@
 #include "kernel_allocator.h"
 
 void interupt();
+void experiment();
 
 void kernel() {
     init_printer();
@@ -14,6 +15,7 @@ void kernel() {
     initialize_intel_8259A();
     sti();
     changeDevice(Keyboard, 1);
-    //interupt();
+    //experiment();
+    changeDevice(Timer, 1);
     for(;;);
 }
