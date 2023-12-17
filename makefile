@@ -1,7 +1,7 @@
 .PHONY: all clear
 
 obj = utils.o vga_print.o kernel_allocator.o interrupts.o nasm_utils.o intel_8259A.o \
-	  tramplins.o
+	  tramplins.o interrupt_handlers.o
 
 all: boot
 
@@ -35,6 +35,9 @@ nasm_utils.o : nasm_utils.asm
 
 tramplins.o : tramplins.asm
 	nasm -felf tramplins.asm -o tramplins.o
+
+interrupt_handlers.o : interrupt_handlers.c
+	gcc -m32 -ffreestanding -c -o  interrupt_handlers.o -fno-pic interrupt_handlers.c
 
 boot.bin: boot.asm
 	nasm -fbin boot.asm -o boot.bin

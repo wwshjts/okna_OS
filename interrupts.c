@@ -1,10 +1,13 @@
 #include "utils.h"
+#include "interrupts.h"
 #include "tramplins.h"
 #include "kernel_allocator.h"
 
 #define IDT_SIZE 256
 #define INTERRUPT_GATE 0xE
 #define TRAP_GATE 0xF
+
+static void** make_tramplins();
 
 #pragma pack(push, 1)
 typedef struct{
@@ -20,20 +23,56 @@ static gate_descriptor* idt;
 
 static void load_idtr(byte*);
 
-static void panic_handler(int vector){
-    kernel_panic("unhandled interrupt %x", vector);
-}
-
-void interrupt_handler() { 
-    print("f");
+void panic(context *ctx){
+    print("Kernel panic: inhandled interrupt %x. Context of interrupted process:\n", ctx->vector);
+    print("EAX = %x\n", ctx->eax);
+    print("ECX = %x\n", ctx->ecx);
+    print("EDX = %x\n", ctx->edx);
+    print("EBX = %x\n", ctx->ebx);
+    print("ESI = %x\n", ctx->esi);
+    print("ESI = %x\n", ctx->esi);
+    print("EDI = %x\n", ctx->edi);
+    print("EBP = %x\n", ctx->ebp);
+    print("ESP = %x\n", ctx->esp);
+    print("DS = %x\n", ctx->ds);
+    print("CS = %x\n", ctx->cs);
+    print("ES = %x\n", ctx->es);
+    print("FS = %x\n", ctx->fs);
+    print("GS = %x\n", ctx->gs);
+    print("EFLAGS (interrupted) = %x\n", ctx->eflags);
     for(;;);
 }
 
+void make_idt() {
+    void** tramplins = make_tramplins();
+    idt = (gate_descriptor*) kernel_malloc(IDT_SIZE * sizeof(gate_descriptor));
+    for(int vector = 0; vector < IDT_SIZE; vector++){
+        byte* handler = tramplins[vector];
+        hword low_shift = (hword) handler;
+        hword high_shift = (hword) (((word) handler) >> 16);
+        idt[vector].low_shift = low_shift;
+        idt[vector].high_shift = high_shift;
+        idt[vector].selector = 8; //code segment
+        // if exception
+        if (vector < 0x20) {
+            idt[vector].info = 0b10000000 + TRAP_GATE;
+        } else {
+            idt[vector].info = 0b10000000 + INTERRUPT_GATE;
+        }
+        idt[vector].info = 0b10001110; //interrupt gate, so dpl = 0
+        idt[vector].space = 0;
+    }
+}
 
-void** tramplins;
+void make_idtr(){
+    byte* idtr = kernel_malloc(sizeof(hword) + sizeof(word));
+    *((hword*)idtr) = IDT_SIZE * sizeof(gate_descriptor) - 1;
+    *((word*)(idtr + 2)) = (word)idt;
+    load_idtr(idtr);
+}
 
-static void make_tramplins () {
-    tramplins = kernel_calloc(IDT_SIZE, sizeof(gate_descriptor));
+static void** make_tramplins () {
+    void** tramplins = kernel_calloc(IDT_SIZE, sizeof(gate_descriptor));
     tramplins[0x00] = tramplin_00;
     tramplins[0x01] = tramplin_01;
     tramplins[0x02] = tramplin_02;
@@ -290,32 +329,6 @@ static void make_tramplins () {
     tramplins[0xFD] = tramplin_FD;
     tramplins[0xFE] = tramplin_FE;
     tramplins[0xFF] = tramplin_FF;
+    return tramplins;
 }
 
-void make_idt() {
-    make_tramplins();
-    idt = (gate_descriptor*) kernel_malloc(IDT_SIZE * sizeof(gate_descriptor));
-    for(int vector = 0; vector < IDT_SIZE; vector++){
-        byte* handler = tramplins[vector];
-        hword low_shift = (hword) handler;
-        hword high_shift = (hword) (((word) handler) >> 16);
-        idt[vector].low_shift = low_shift;
-        idt[vector].high_shift = high_shift;
-        idt[vector].selector = 8; //code segment
-        // if exception
-        if (vector < 0x20) {
-            idt[vector].info = 0b10000000 + TRAP_GATE;
-        } else {
-            idt[vector].info = 0b10000000 + INTERRUPT_GATE;
-        }
-        idt[vector].info = 0b10001110; //interrupt gate, so dpl = 0
-        idt[vector].space = 0;
-    }
-}
-
-void make_idtr(){
-    byte* idtr = kernel_malloc(sizeof(hword) + sizeof(word));
-    *((hword*)idtr) = IDT_SIZE * sizeof(gate_descriptor) - 1;
-    *((word*)(idtr + 2)) = (word)idt;
-    load_idtr(idtr);
-}
