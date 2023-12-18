@@ -5,7 +5,7 @@
     byte inb(hword port);
     void outb(hword port, byte data);
     void initialize_intel_8259A();
-    void eoi(int);
+    void eoi(word);
     enum Device {
         Timer,
         Keyboard,

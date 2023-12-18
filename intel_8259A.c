@@ -28,13 +28,17 @@ void initialize_intel_8259A(){
     outb(SLAVE_DATA, 0b11111111); // 1 - turn off, 0 - turn on
 }
 
-void eoi(int irq) {
-    outb(SLAVE_DATA, 0x20);
-    outb(DIAGNOSTIC_PORT_BIOS, 0);
+void eoi(word irq) {
+    outb(MASTER_COMMAND, 0x20);
     if (irq >= 0x28) {
-        outb(MASTER_DATA, 0x20);
-        outb(DIAGNOSTIC_PORT_BIOS, 0);
+        outb(SLAVE_COMMAND, 0x20);
     }
+}
+
+void showMask() {
+    byte mask = inb(MASTER_DATA);
+    outb(DIAGNOSTIC_PORT_BIOS, 0);
+    print("mask %x\n", mask);
 }
 
 //change: 1 - turn on, 0 - turn of

@@ -35,9 +35,9 @@ void exception_1D(context* ctx){panic(ctx);}
 void exception_1E(context* ctx){panic(ctx);}
 void exception_1F(context* ctx){panic(ctx);}
 void hardware_interrupt_20(context* ctx){
-    sti();
     timer_interrupt(ctx);
     eoi(0x20);
+    sti();
 }
 void hardware_interrupt_21(context* ctx){panic(ctx); eoi(0x21); sti();}
 void hardware_interrupt_22(context* ctx){panic(ctx); eoi(0x22); sti();}

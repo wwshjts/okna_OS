@@ -44,8 +44,8 @@ void panic(context *ctx){
 
 word timer = 0;
 void timer_interrupt() {
-    print("%d ", timer);
     timer++;
+    print("%d\n", timer);
 }
 
 void make_idt() {
@@ -60,9 +60,9 @@ void make_idt() {
         idt[vector].selector = 8; //code segment
         // if exception
         if (vector < 0x20) {
-            idt[vector].info = 0b10000000 + TRAP_GATE;
+            idt[vector].info = 0b10001111;
         } else {
-            idt[vector].info = 0b10000000 + INTERRUPT_GATE;
+            idt[vector].info = 0b10001110;
         }
         idt[vector].space = 0;
     }

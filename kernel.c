@@ -9,13 +9,17 @@ void interupt();
 void experiment();
 
 void kernel() {
+    sti();
     init_printer();
     make_idt();
     make_idtr();
     initialize_intel_8259A();
-    sti();
-    changeDevice(Keyboard, 1);
     //experiment();
+    sti();
+    //changeDevice(Keyboard, 1);
     changeDevice(Timer, 1);
-    for(;;);
+    while (1) {
+        print("*");
+    }
+    //for(;;);
 }
