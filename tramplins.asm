@@ -281,9 +281,6 @@ collect_context:
 	pop ds
 	add esp,  8
     IRETD
-    
-
-
 tramplin_00:
     push 0x00
     push 0x00

@@ -12,19 +12,31 @@ void interrupt_handler(context* ctx) {
 
 collect_context = """
 collect_context:
-    ; 0x10 смещение DATA_SEG в GTD
-    mov eax, 0x10
-    mov ds, eax
-    mov es, eax
     push ds
     push es
     push fs
     push gs
     pusha
+
+    ; 0x10 смещение DATA_SEG в GTD
+    mov eax, 0x10
+    mov ds, eax
+    mov es, eax
+    push esp                ;передаем контекст в C 
+
     call interrupt_handler
+
+	pop esp
+	popa
+	pop gs
+	pop fs
+	pop es
+	pop ds
+	add esp,  8
+    IRETD
 """
 
-
+"""
 with open("tramplins.h", "w") as out:
     out.write("void interrupt_handler();\n")
     for i in range(0xFF + 1):
@@ -60,6 +72,7 @@ with open("interrupt_handlers.c", "w") as out:
         out.write('break;\n')
     out.write(tab + "}\n")
     out.write("}")
+"""
 
 
 with open("tramplins.asm", 'w') as out:
