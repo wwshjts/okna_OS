@@ -42,7 +42,7 @@ void showMask() {
 }
 
 //change: 1 - turn on, 0 - turn of
-void changeDevice(enum Device device, int change){
+void change_device(enum Device device, int change){
     int shift;
     hword port = MASTER_DATA;
     switch (device){

@@ -7,4 +7,7 @@
     void memzero(byte* start, int size);
     void memcpy(byte* from, byte* to, int size);
     void kernel_panic(const char* fmt, int vector);
+    void setPGInCr0();
+    void setPSEInCr4();
+    void setCr3(word cr3);
 #endif

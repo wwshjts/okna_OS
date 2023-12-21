@@ -4,3 +4,4 @@
 *.tmp
 os.bxrc
 os-dbg.bxrc
+.vscode

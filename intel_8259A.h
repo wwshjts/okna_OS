@@ -11,5 +11,5 @@
         Keyboard,
         Slave
     };
-    void changeDevice(enum Device device, int change);
+    void change_device(enum Device device, int change);
 #endif

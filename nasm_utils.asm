@@ -1,36 +1,62 @@
 [BITS 32]
 
-[GLOBAL load_idtr]
-[GLOBAL interupt]
-[GLOBAL sti]
-[GLOBAL cli]
-[GLOBAL outb]
-[GLOBAL inb]
-[GLOBAL experiment]
+[GLOBAL _load_idtr]
+[GLOBAL _interupt]
+[GLOBAL _sti]
+[GLOBAL _cli]
+[GLOBAL _outb]
+[GLOBAL _inb]
+[GLOBAL _experiment]
+[GLOBAL _setPGInCr0]
+[GLOBAL _setPSEInCr4]
+[GLOBAL _setCr3]
 
-load_idtr:
+_load_idtr:
     mov ebx, [esp+4]
     lidt [ebx]
     ret
 
-interupt:
+_interupt:
     INT 0x42
     ret
 
-cli:
+_cli:
     cli
     ret
 
-sti:
+_sti:
     sti
     ret
 
-inb:
+_inb:
     mov dx, [esp+4]
     in al, dx
     ret
 
-experiment:
+_outb:
+    mov dx, [esp+4]
+    mov al, [esp+8]
+    out dx, al
+    ret
+
+_setPGInCr0:
+    mov eax, cr0
+    or  eax, 0b10000000000000000000000000000000    ; 31 bit
+    mov cr0, eax
+    ret
+
+_setPSEInCr4:
+    mov eax, cr4
+    or  eax, 0b1000    ; 4 bit
+    mov cr4, eax
+    ret
+
+_setCr3:
+    mov eax, [esp+4]
+    mov cr3, eax
+    ret
+
+_experiment:
     mov eax, 1
     mov ecx, 2
     mov edx, 3
@@ -39,10 +65,3 @@ experiment:
     mov edi, 6
     mov ebp, 7
     int 42
-
-
-outb:
-    mov dx, [esp+4]
-    mov al, [esp+8]
-    out dx, al
-    ret

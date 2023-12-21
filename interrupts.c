@@ -45,7 +45,7 @@ void panic(context *ctx){
 word timer = 0;
 void timer_interrupt() {
     timer++;
-    print("%d\n", timer);
+    print("%d", timer);
 }
 
 void make_idt() {
