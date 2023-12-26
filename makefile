@@ -1,7 +1,7 @@
 .PHONY: all clear
 
 obj = utils.o vga_print.o kernel_allocator.o interrupts.o nasm_utils.o intel_8259A.o \
-	  tramplins.o interrupt_handlers.o page_broadcast.o
+	  tramplins.o interrupt_handlers.o page_translation.o
 
 all: boot
 
@@ -30,8 +30,8 @@ interrupts.o : interrupts.c
 intel_8259A.o : intel_8259A.c
 	gcc -m32 -ffreestanding -c -o  intel_8259A.o -fno-pic intel_8259A.c
 
-page_broadcast.o : page_broadcast.c
-	gcc -m32 -ffreestanding -c -o  page_broadcast.o -fno-pic page_broadcast.c
+page_translation.o : page_translation.c
+	gcc -m32 -ffreestanding -c -o  page_translation.o -fno-pic page_translation.c
 
 nasm_utils.o : nasm_utils.asm
 	nasm -felf nasm_utils.asm -o nasm_utils.o

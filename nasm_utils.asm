@@ -10,6 +10,7 @@
 [GLOBAL _setPGInCr0]
 [GLOBAL _setPSEInCr4]
 [GLOBAL _setCr3]
+[GLOBAL _invlPG]
 
 _load_idtr:
     mov ebx, [esp+4]
@@ -47,13 +48,18 @@ _setPGInCr0:
 
 _setPSEInCr4:
     mov eax, cr4
-    or  eax, 0b1000    ; 4 bit
+    or  eax, 0b10000    ; 4 bit
     mov cr4, eax
     ret
 
 _setCr3:
     mov eax, [esp+4]
     mov cr3, eax
+    ret
+
+_invlPG:
+    mov eax, [esp+4]
+    invlpg [eax]
     ret
 
 _experiment:

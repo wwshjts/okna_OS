@@ -10,4 +10,5 @@
     void setPGInCr0();
     void setPSEInCr4();
     void setCr3(word cr3);
+    void invlPG(word adress);
 #endif
